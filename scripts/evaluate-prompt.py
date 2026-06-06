@@ -88,13 +88,33 @@ VAGUE = [
     r"\b(react native|expo|flutter|tauri|electron|swift|kotlin|jetpack)\b",
 ]
 
+# NON-BUILD intent — analytical/strategic/conversational requests (es/en).
+# These ask to audit, analyze, review, compare, explain or plan — NOT to build.
+# A prompt led by this intent is never a "build" even if it name-drops tech
+# vendors/frameworks (anthropic, gemini, docker, mcp...) that trip VAGUE patterns.
+NONBUILD = [
+    r"\b(audit[aá]?r?|analiz[aá]?r?|evalu[aá]?r?|revis[aá]?r?|compar[aá]?r?|"
+    r"explic[aá]?r?|investig[aá]?r?|diagnostic[aá]?r?|resum[ií]?r?|"
+    r"document[aá]?r?|audit|analy[sz]e|review|compare|explain|investigate|"
+    r"diagnose|summari[sz]e|assess)\b",
+    r"\b(qu[eé] (te parece|opin[aá]s|pens[aá]s|es|hace|trae)|"
+    r"nos sirve|conviene|deber[ií]amos|qu[eé] (pasa|hacemos)|"
+    r"hac[eé]r? un diff|diff conceptual|go.?no.?go)\b",
+]
+
 text = prompt.lower()
 words = len(text.split())
 clear_hits = sum(1 for s in CLEAR if re.search(s, text))
 vague_hits = sum(1 for s in VAGUE if re.search(s, text))
+nonbuild_hits = sum(1 for s in NONBUILD if re.search(s, text))
 
 # Long detailed prompts with multiple clear signals pass through
 if words > 35 and clear_hits >= 3:
+    output_json(prompt)
+    sys.exit(0)
+
+# Analytical/strategic intent wins over incidental framework tokens — pass through.
+if nonbuild_hits > 0:
     output_json(prompt)
     sys.exit(0)
 

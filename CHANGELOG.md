@@ -2,6 +2,15 @@
 
 All notable changes to prompt-mini are documented here.
 
+## [0.1.2]
+
+### Fixed
+- Analytical/strategic prompts no longer misfire as "build". Added a NON-BUILD intent guard (es/en): prompts led by audit/analyze/evaluate/review/compare/explain/investigate/diagnose/summarize/document (auditá, analizá, evaluá, revisá, compará, explicá, investigá, diagnosticá, resumí, documentá) or by analytical phrasings ("qué te parece", "nos sirve", "conviene", "deberíamos", "hacé un diff", "go/no-go") now pass through even when they name-drop vendor/framework tokens (anthropic, gemini, docker, mcp, langchain...) that trip the VAGUE patterns. Root cause of Spanish strategy/audit requests being intercepted as build tasks.
+
+### Notes
+- Added regression tests (`test_audit_with_tech_tokens_passes`, `test_spanish_analyze_with_framework_passes`, `test_english_review_with_framework_passes`, `test_real_build_es_still_triggers`). Suite: 40 tests passing.
+- Guard runs before `needs_skill`; real build prompts ("crear un dashboard con react y stripe desde cero", "build a nextjs app with supabase auth") still trigger.
+
 ## [0.1.1]
 
 ### Fixed

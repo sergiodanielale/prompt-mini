@@ -184,6 +184,26 @@ class TestQuestionsAndNonBuild:
         out = run_hook("build a nextjs app with supabase auth")
         assert is_triggered(out)
 
+    def test_audit_with_tech_tokens_passes(self):
+        """Analytical intent (audit) wins over incidental vendor tokens."""
+        out = run_hook(
+            "Audita el repo ECC contra mi ecosistema. Trae configs MCP, "
+            "soporte Claude Gemini Codex, gano un hackathon de Anthropic."
+        )
+        assert not is_triggered(out)
+
+    def test_spanish_analyze_with_framework_passes(self):
+        out = run_hook("analiza si nos sirve langchain para el worker")
+        assert not is_triggered(out)
+
+    def test_english_review_with_framework_passes(self):
+        out = run_hook("review whether we should use supabase or firebase here")
+        assert not is_triggered(out)
+
+    def test_real_build_es_still_triggers(self):
+        out = run_hook("crear un dashboard con react y stripe desde cero")
+        assert is_triggered(out)
+
 
 # ── Output structure tests ────────────────────────────────────────────────────
 
