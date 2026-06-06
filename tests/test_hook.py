@@ -152,6 +152,39 @@ class TestVaguePrompts:
         assert is_triggered(out)
 
 
+# ── Question / non-build pass-through tests (es/en) ────────────────────────────
+# Regression guard: questions and short non-build prompts must NEVER trigger the
+# skill. The hook is for BUILD intent only — brevity or Spanish phrasing alone is
+# not "vague". See evaluate-prompt.py: question bypass + needs_skill requires a
+# real vague (build) hit.
+
+class TestQuestionsAndNonBuild:
+    def test_spanish_question_passes(self):
+        out = run_hook("que es esto? Kapso")
+        assert not is_triggered(out)
+
+    def test_spanish_question_trailing_qmark(self):
+        out = run_hook("es opensource ? o paga esa opcion?")
+        assert not is_triggered(out)
+
+    def test_english_question_passes(self):
+        out = run_hook("what does this repository actually do?")
+        assert not is_triggered(out)
+
+    def test_short_spanish_command_no_build(self):
+        out = run_hook("actualiza la info del repo local")
+        assert not is_triggered(out)
+
+    def test_spanish_analysis_request_no_build(self):
+        out = run_hook("profundiza el analisis de este repositorio")
+        assert not is_triggered(out)
+
+    def test_build_still_triggers_despite_being_short(self):
+        """Sanity: a real build prompt must still trigger after the fix."""
+        out = run_hook("build a nextjs app with supabase auth")
+        assert is_triggered(out)
+
+
 # ── Output structure tests ────────────────────────────────────────────────────
 
 class TestOutputStructure:

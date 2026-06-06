@@ -1,7 +1,7 @@
 {
   "name": "prompt-mini",
   "description": "Claude Code plugin that uses skill architecture to intercept vague prompts, ask clarifying questions, and return structured framework-aware prompts that has credit saving patterns built in.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "nidhinjs"
   },

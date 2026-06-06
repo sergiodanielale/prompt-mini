@@ -33,6 +33,11 @@ if prompt.startswith(("/", "#")):
     output_json(prompt)
     sys.exit(0)
 
+# Questions are never "build something" — pass through (covers es/en interrogatives)
+if prompt.strip().endswith(("?", "؟")):
+    output_json(prompt)
+    sys.exit(0)
+
 # Short or empty prompts — pass through silently
 if not prompt or len(prompt.strip()) < 12:
     sys.exit(0)
@@ -88,21 +93,14 @@ words = len(text.split())
 clear_hits = sum(1 for s in CLEAR if re.search(s, text))
 vague_hits = sum(1 for s in VAGUE if re.search(s, text))
 
-# Any prompt under 6 words with no clear signals is vague
-if words < 6 and clear_hits == 0:
-    vague_hits += 3
-
-# Medium prompts with no clear signals lean vague
-if words < 15 and clear_hits == 0 and vague_hits == 0:
-    vague_hits += 1
-
 # Long detailed prompts with multiple clear signals pass through
 if words > 35 and clear_hits >= 3:
     output_json(prompt)
     sys.exit(0)
 
-# Clear wins only if it strongly outweighs vague
-needs_skill = vague_hits >= clear_hits or (vague_hits > 0 and clear_hits <= 1)
+# The skill only fires for real BUILD signals — brevity alone is not "vague".
+# Requires at least one vague (build) hit, and that it outweighs clear signals.
+needs_skill = vague_hits > 0 and (vague_hits >= clear_hits or clear_hits <= 1)
 
 # ── Output ─────────────────────────────────────────────────────────────────
 if needs_skill:
